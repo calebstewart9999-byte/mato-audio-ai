@@ -1,0 +1,25 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mato-podcast-generator
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      INNGEST_DEV: "1"
+      INNGEST_BASE_URL: http://inngest:8288
+    restart: unless-stopped
+
+  inngest:
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: npx inngest-cli@latest dev -u http://app:3000/api/inngest
+    depends_on:
+      - app
+    ports:
+      - "8288:8288"
